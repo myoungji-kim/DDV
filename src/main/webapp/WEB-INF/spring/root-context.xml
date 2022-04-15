@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	<!-- Web 기술과 무관한 빈 등록 목적 -->	
+	
+	<!-- Oracle 전용 -->
+	<!-- 데이터베이스 연결 --> 
+<!-- 	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"> 
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/> 
+		<property name="url" value="jdbc:oracle:thin:@localhost:1521:ddingji" />  1521 뒤에는 사용자명 입력
+		<property name="username" value="(username)"/> 
+		<property name="password" value="(password)"/> 
+	</bean> -->
+	
+	
+	<!--  MySQL 전용  -->
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+		<property name="driverClassName" value="org.mariadb.jdbc.Driver" />
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3306/ddv?characterEncoding=UTF-8" />
+		<property name="username" value="(username)" />
+		<property name="password" value="(password)" />
+	</bean>
+	
+	<!-- SqlSessionFactory (파일 없으면 404 에러 뜸) -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="mapperLocations">
+        	<list>
+        		<value>classpath:/mapper/home-sql.xml</value>
+        		<value>classpath:/mapper/admin-sql.xml</value>
+        	</list>
+        </property>
+	</bean>
+	
+	<!-- SqlSessionTemplate DB연결 & 종료 -->
+	<bean id="SqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory" />
+	</bean>
+	
+	<!-- MultipartResolver (File upload) -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="10000000"></property>
+		<property name="maxInMemorySize" value="100000000"></property>
+	</bean>
+	
+	
+</beans>
