@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="homeMapper">
+	
+	<!--  Oracle == MySQL  -->
+	<select id="countAllSurvey" parameterType="string" resultType="int">
+		SELECT COUNT(*) 
+		FROM ddv_survey s 
+			WHERE s.title LIKE '%'||#{searchKey}||'%' 
+	</select>
+	
+	<!-- Oracle : selectAllSurvey -->
+	<!-- <select id="selectAllSurvey" parameterType="hashmap" resultType="hashmap">
+	<![CDATA[
+		SELECT * FROM (
+		    SELECT ROWNUM rn, b.*
+		        FROM ( SELECT s.* FROM ddv_survey s WHERE s.title LIKE '%'||#{searchKey}||'%' ORDER BY s.s_idx DESC ) b
+		) WHERE rn between #{pageInfo.contentBegin} and #{pageInfo.contentEnd}
+	]]> 
+	</select> -->
+	
+	<!-- MySQL : selectAllSurvey -->
+	<select id="selectAllSurvey" parameterType="hashmap" resultType="hashmap">
+		SELECT * 
+		FROM ddv_survey 
+		WHERE title 
+		LIKE CONCAT('%',#{searchKey},'%') 
+		ORDER BY s_idx DESC 
+		LIMIT #{pageInfo.contentBegin}, #{pageInfo.contentNum}
+	</select>
+	
+	<!--  Oracle == MySQL  -->
+	<select id="selectOneSurvey" parameterType="hashmap" resultType="hashmap">
+		SELECT *
+		FROM ddv_survey
+		WHERE s_idx=#{s_idx}
+	</select>
+	
+	<!--  Oracle == MySQL  -->
+	<select id="surveyAlreadyJoin" parameterType="hashmap" resultType="hashmap">     
+		select s_idx
+		from ddv_point
+		where s_idx=#{s_idx} and m_idx=#{m_idx}
+	</select>
+	
+	<!--  Oracle == MySQL  -->
+	<select id="dupeIdCheck" parameterType="string" resultType="string">
+		SELECT userid
+		FROM ddv_member
+		WHERE userid=#{userid}
+	</select>
+	
+	<!--  Oracle : insertUserSurveyAnswer  -->
+	<!-- <insert id="insertUserSurveyAnswer" parameterType="hashmap">
+		insert into ddv_survey_join(s_idx, m_idx, q_idx, a_idx, joindate)
+		values (#{s_idx}, #{m_idx}, #{q_idx}, #{a_idx}, sysdate)
+	</insert> -->
+	
+	<!-- MySQL : insertUserSurveyAnswer -->
+	<insert id="insertUserSurveyAnswer" parameterType="hashmap">
+		insert into ddv_survey_join(s_idx, m_idx, q_idx, a_idx, joindate)
+		values (#{s_idx}, #{m_idx}, #{q_idx}, #{a_idx}, now())
+	</insert>
+	
+	<!--  Oracle : insertUserSurveyJoinPoint-->
+	<!-- <insert id="insertUserSurveyJoinPoint" parameterType="hashmap">
+		insert into ddv_point(s_idx, m_idx, getpoint, getdate)
+		values (#{s_idx}, #{m_idx}, #{point}, sysdate)
+	</insert>  -->
+	
+	<!--  MySQL : insertUserSurveyJoinPoint -->
+	<insert id="insertUserSurveyJoinPoint" parameterType="hashmap">
+		insert into ddv_point(s_idx, m_idx, getpoint, getdate)
+		values (#{s_idx}, #{m_idx}, #{point}, now())
+	</insert> 
+	
+	<!--  Oracle : insertMember  -->
+<!-- 	<insert id="insertMember" parameterType="hashmap">
+		insert into ddv_member(m_idx, userid, passwd, username, gender, 
+								phone1, phone2, phone3, email1, email2, joindate, role)
+		values(ddv_member_seq.nextval, #{userid}, #{passwd}, #{username}, #{gender}, 
+				#{phone1}, #{phone2}, #{phone3}, #{email1}, #{email2}, sysdate, 'user')
+	</insert> -->
+	
+	<!-- MySQL : insertMember -->
+	<insert id="insertMember" parameterType="hashmap">
+		insert into ddv_member(userid, passwd, username, gender, 
+								phone1, phone2, phone3, email1, email2, joindate, role)
+		values(#{userid}, #{passwd}, #{username}, #{gender}, 
+				#{phone1}, #{phone2}, #{phone3}, #{email1}, #{email2}, now(), 'user')
+	</insert>
+
+	<!--  Oracle == MySQL  -->
+	<select id="findID" parameterType="hashmap" resultType="hashmap">
+		select userid
+		from ddv_member
+		where username=#{username} and phone1=#{phone1} and phone2=#{phone2} and phone3=#{phone3}
+	</select>
+
+	<!--  Oracle == MySQL  -->
+	<select id="login" parameterType="hashmap" resultType="hashmap">
+		select m_idx, userid, username, email1, email2
+		from ddv_member 
+		where userid=#{userid} and passwd=#{passwd} 
+	</select>
+	
+	<!--  Oracle == MySQL  -->
+	<select id="selectMyInfo" parameterType="hashmap" resultType="hashmap">
+		select *
+		from ddv_member
+		where m_idx=#{m_idx}
+	</select>
+	
+	<!--  Oracle == MySQL  -->
+	<update id="updateMember" parameterType="hashmap">
+		update ddv_member
+		set passwd=#{passwd},
+			username=#{username}, 
+			gender=#{gender}, 
+			phone1=#{phone1}, 
+			phone2=#{phone2}, 
+			phone3=#{phone3}, 
+			email1=#{email1}, 
+			email2=#{email2}
+		where m_idx=#{m_idx}
+	</update>
+	
+	<!--  Oracle == MySQL  -->
+	<select id="countQuestions" parameterType="hashmap" resultType="int">
+		select count(q_idx)
+		from ddv_survey_question
+		where s_idx=#{s_idx}
+	</select>
+	
+	<!--  Oracle == MySQL  -->
+	<select id="selectQuestionList" parameterType="hashmap" resultType="hashmap">
+		select q.s_idx, q.q_idx, q.question, q.image1
+		from ddv_survey_question q
+		where q.s_idx = #{s_idx}
+		order by q_idx
+	</select>
+	
+	<!--  Oracle == MySQL  -->
+	<select id="selectAnswerList" parameterType="hashmap" resultType="hashmap">
+		select a_idx, text
+        from ddv_survey_answer
+        where s_idx = #{s_idx} and q_idx = #{q_idx}
+        order by a_idx
+	</select>
+	
+	<!--  Oracle : selectMyPoints  -->
+<!-- 	<select id="selectMyPoints" parameterType="hashmap" resultType="hashmap">
+		select p.getpoint, to_char(p.getdate, 'YYYY.MM.DD') getdate, s.title
+		from ddv_point p left outer join ddv_survey s
+		on p.s_idx = s.s_idx
+		where p.m_idx = #{m_idx}
+		order by getdate desc
+	</select> -->
+	
+	<!-- MySQL : selectMyPoints -->
+	<select id="selectMyPoints" parameterType="hashmap" resultType="hashmap">
+		select p.getpoint, date_format(p.getdate, '%Y.%m.%d') getdate, s.title
+		from ddv_point p left outer join ddv_survey s
+		on p.s_idx = s.s_idx
+		where p.m_idx = #{m_idx}
+		order by getdate desc
+	</select>
+	
+	<!--  Oracle == MySQL  -->
+	<select id="sumMyPoints" parameterType="hashmap" resultType="int">
+		select sum(getpoint)
+		from ddv_point
+		where m_idx=#{m_idx}
+	</select>
+	
+	<!--  Oracle : selectMyInquireList  -->
+<!-- 	<select id="selectMyInquireList" parameterType="hashmap" resultType="hashmap">
+		select i_idx, m_idx, to_char(writedate, 'YYYY-MM-DD') writedate, question, 
+					admin_idx, to_char(answerdate, 'YYYY-MM-DD') answerdate, answer, complete
+		from ddv_inquire
+		where m_idx = #{m_idx}
+		order by i_idx desc
+	</select> -->
+	
+	<!--  MySQL : selectMyInquireList  -->
+	<select id="selectMyInquireList" parameterType="hashmap" resultType="hashmap">
+		select i_idx, m_idx, date_format(writedate, '%Y-%m-%d') writedate, question, 
+					admin_idx, date_format(answerdate, '%Y-%m-%d') answerdate, answer, complete
+		from ddv_inquire
+		where m_idx = #{m_idx}
+		order by i_idx desc
+	</select>
+	
+	<!--  Oracle : selectOneInquireInfo -->
+	<!-- <select id="selectOneInquireInfo" parameterType="hashmap" resultType="hashmap">
+		select i_idx, m_idx, to_char(writedate, 'YYYY.MM.DD') writedate, question,
+					 admin_idx, to_char(answerdate, 'YYYY.MM.DD') answerdate, answer, complete
+		from ddv_inquire
+		where i_idx = #{i_idx}
+	</select> -->
+	
+	<!--  MySQL : selectOneInquireInfo -->
+	<select id="selectOneInquireInfo" parameterType="hashmap" resultType="hashmap">
+		select i_idx, m_idx, date_format(writedate, '%Y.%m.%d') writedate, question,
+					 admin_idx, date_format(answerdate, '%Y.%m.%d') answerdate, answer, complete
+		from ddv_inquire
+		where i_idx = #{i_idx}
+	</select>
+	
+	<!--  Oracle : insertInquire  -->
+	<!-- <insert id="insertInquire" parameterType="hashmap">
+		insert into ddv_inquire(i_idx, m_idx, writedate, question, complete)
+		values (ddv_inquire_seq.nextval, #{m_idx}, sysdate, #{question}, '답변 대기')
+	</insert> -->
+	
+	<!-- MySQL : insertInquire -->
+	<insert id="insertInquire" parameterType="hashmap">
+		insert into ddv_inquire(m_idx, writedate, question, complete)
+		values (#{m_idx}, now(), #{question}, '답변 대기')
+	</insert>
+	
+	
+	<!-- Oracle :  insertPoll -->
+	<!-- <insert id="insertPoll" parameterType="hashmap">
+		insert into ddv_poll (p_idx, m_idx, question, image, option1, writedate, enddate)
+		values (ddv_poll_seq.nextval, #{m_idx}, #{question}, #{image}, #{option1}, sysdate, #{enddate})
+		<selectKey resultType="int" keyProperty="p_idx" order="AFTER">
+	        <![CDATA[
+		        select p_idx from (
+				    select p_idx from ddv_poll order by p_idx desc )
+				where rownum < 2
+			]]>
+	    </selectKey> 
+	</insert> -->
+	
+	<!-- MySQL : insertPoll -->
+	<insert id="insertPoll" parameterType="hashmap"  useGeneratedKeys="true" keyProperty="p_idx">
+		insert into ddv_poll (m_idx, question, image, option1, writedate, enddate)
+		values (#{m_idx}, #{question}, #{image}, #{option1}, now(), #{enddate})
+	</insert>
+	
+	<!--  Oracle == MySQL  -->
+	<update id="updatePoll" parameterType="hashmap">
+		update ddv_poll
+		set question=#{question},
+			image=#{image}, 
+			option1=#{option1}, 
+			enddate=#{enddate}
+		where p_idx=#{p_idx}
+	</update>
+	
+	<!--  Oracle == MySQL  -->
+	<insert id="insertPollAnswer" parameterType="hashmap">
+		insert into ddv_poll_answer (p_idx, pa_idx, text)
+		values (#{p_idx}, #{pa_idx}, #{text})
+	</insert>
+	
+	<!--  Oracle == MySQL  -->
+	<delete id="deletePoll" parameterType="hashmap">
+		delete from ddv_poll
+		where p_idx=${p_idx}
+	</delete>
+	
+	<!--  Oracle == MySQL  -->
+	<delete id="deletePollAnswer" parameterType="hashmap">
+		delete from ddv_poll_answer
+		where p_idx=${p_idx}
+	</delete>
+	
+	<!-- Oracle : selectMyPollList -->
+	<!-- <select id="selectMyPollList" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+		SELECT * FROM (
+		SELECT ROWNUM rn, b.*
+		        FROM ( SELECT p.p_idx, p.question, p.image, p.option1, to_char(p.writedate, 'YYYY-MM-DD') writedate, 
+		        			to_char(p.enddate, 'YYYY-MM-DD') enddate, p.m_idx 
+		        		FROM ddv_poll p 
+		        		WHERE p.m_idx = #{m_idx} AND p.question LIKE '%'||#{searchKey}||'%'
+		        		ORDER BY p.p_idx DESC ) b
+		) WHERE rn between #{pageInfo.contentBegin} and #{pageInfo.contentEnd}
+	]]>
+	</select> -->
+	
+	<!-- MySQL : selectMyPollList -->
+	<select id="selectMyPollList" parameterType="hashmap" resultType="hashmap">
+		SELECT p.p_idx, p.question, p.image, p.option1, DATE_FORMAT(p.writedate, '%Y-%m-%d') writedate,
+		        		 DATE_FORMAT(p.enddate, '%Y-%m-%d') enddate, p.m_idx
+		FROM ddv_poll p
+		WHERE p.m_idx = #{m_idx} AND p.question LIKE CONCAT('%',#{searchKey},'%') ORDER BY p_idx DESC 
+		LIMIT #{pageInfo.contentBegin}, #{pageInfo.contentNum}
+	</select>
+	
+	<!--  Oracle == MySQL  -->
+	<select id="countMyPollAttends" parameterType="hashmap" resultType="int">
+		select count(*) 
+		from ddv_poll_join j
+		left outer join ddv_poll p
+		on j.p_idx = p.p_idx
+		where p.p_idx = #{p_idx}
+	</select>
+	
+	<!--  Oracle == MySQL  -->
+	<select id="selectMyPollAnswer" parameterType="hashmap" resultType="hashmap">
+		 select p.p_idx, p.question, a.pa_idx, a.text, (select count(*) from ddv_poll_join j
+		                where p.p_idx=j.p_idx and a.pa_idx = j.pa_idx) sum
+		from ddv_poll p
+		left outer join ddv_poll_answer a
+		on p.p_idx = a.p_idx
+		where p.p_idx = #{p_idx}
+		order by p.p_idx, a.pa_idx
+	</select>
+	
+	<!--  Oracle : selectMyPollInfo -->
+	<!-- <select id="selectMyPollInfo" parameterType="hashmap" resultType="hashmap">
+		select p_idx, question, image, option1, to_char(writedate, 'YYYY-MM-DD') writedate, 
+					to_char(enddate, 'YYYY-MM-DD') enddate, m_idx
+		from ddv_poll
+		where p_idx=#{p_idx}
+	</select> -->
+	
+	<!-- MySQL : selectMyPollInfo -->
+	<select id="selectMyPollInfo" parameterType="hashmap" resultType="hashmap">
+		select p_idx, question, image, option1, date_format(writedate, '%Y-%m-%d') writedate, 
+					date_format(enddate, '%Y-%m-%d') enddate, m_idx
+		from ddv_poll
+		where p_idx=#{p_idx}
+	</select>
+	
+	<!-- Oracle : countAllOpenPoll -->
+	<!-- <select id="countAllOpenPoll" parameterType="hashmap" resultType="int">
+		<![CDATA[
+			SELECT COUNT(*) 
+			FROM ddv_poll
+			WHERE option1='전체' AND question LIKE '%'||#{searchKey}||'%' 
+		]]>
+	</select> -->
+	
+	<!-- MySQL : countAllOpenPoll -->
+	<select id="countAllOpenPoll" parameterType="hashmap" resultType="int">
+			SELECT COUNT(*) 
+			FROM ddv_poll
+			WHERE option1='전체' AND question LIKE CONCAT('%',#{searchKey},'%')
+	</select>
+	
+	
+	<!-- Oracle : countAllOpenMyPoll -->
+	<!-- <select id="countAllOpenMyPoll" parameterType="hashmap" resultType="int">
+		<![CDATA[
+			SELECT COUNT(*) 
+			FROM ddv_poll
+			WHERE option1='전체' AND question LIKE '%'||#{searchKey}||'%' AND m_idx=#{m_idx}
+		]]>
+	</select> -->
+	
+	<!-- MySQL : countAllOpenMyPoll -->
+	<select id="countAllOpenMyPoll" parameterType="hashmap" resultType="int">
+			SELECT COUNT(*) 
+			FROM ddv_poll
+			WHERE option1='전체' AND question LIKE CONCAT('%',#{searchKey},'%') AND m_idx=#{m_idx}
+	</select>
+	
+	<!-- Oracle : selectPollList -->
+	<!-- <select id="selectPollList" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			SELECT * FROM (
+			SELECT ROWNUM rn, b.*
+			        FROM ( SELECT p.p_idx, p.question, p.image, p.option1, to_char(p.writedate, 'YYYY-MM-DD') writedate,
+			        			  to_char(p.enddate, 'YYYY-MM-DD') enddate, p.m_idx 
+			        		FROM ddv_poll p 
+			        		WHERE option1 = '전체' AND p.question LIKE '%'||#{searchKey}||'%' 
+							ORDER BY p.p_idx DESC ) b
+			) WHERE rn between #{pageInfo.contentBegin} and #{pageInfo.contentEnd}
+		]]>
+	</select> -->
+	
+	<!-- MySQL : selectPollList -->
+	<select id="selectPollList" parameterType="hashmap" resultType="hashmap">
+			SELECT p.p_idx, p.question, p.image, p.option1, DATE_FORMAT(p.writedate, '%Y-%m-%d') writedate,
+			        		 DATE_FORMAT(p.enddate, '%Y-%m-%d') enddate, p.m_idx 
+			FROM ddv_poll p 
+			WHERE option1 = '전체' AND p.question LIKE CONCAT('%',#{searchKey},'%') 
+			ORDER BY p_idx DESC 
+			LIMIT #{pageInfo.contentBegin}, #{pageInfo.contentNum} 
+	</select>
+
+	<!--  Oracle == MySQL  -->
+	<select id="countPollAttends" parameterType="hashmap" resultType="int">
+		select count(*) 
+		from ddv_poll_join j
+		left outer join ddv_poll p
+		on j.p_idx = p.p_idx
+		where p.p_idx = #{p_idx}
+	</select>
+	
+	<!--  Oracle == MySQL  -->
+	<select id="selectPollAnswer" parameterType="hashmap" resultType="hashmap">
+		select p_idx, pa_idx, text
+        from ddv_poll_answer
+        where p_idx=#{p_idx}
+        order by pa_idx
+	</select>
+	
+	<!--  Oracle == MySQL  -->
+	<select id="selectPollJoinMember" parameterType="hashmap" resultType="int">
+		select m_idx
+        from ddv_poll_join
+        where p_idx=#{p_idx}
+	</select>
+	
+	<!--  Oracle : votePoll  -->
+	<!-- <insert id="votePoll" parameterType="hashmap">
+		insert into ddv_poll_join (p_idx, pa_idx, m_idx, joindate)
+		values (#{p_idx}, #{pa_idx}, #{m_idx}, sysdate)
+	</insert> -->
+	
+	<!-- MySQL : votePoll -->
+	<insert id="votePoll" parameterType="hashmap">
+		insert into ddv_poll_join (p_idx, pa_idx, m_idx, joindate)
+		values (#{p_idx}, #{pa_idx}, #{m_idx}, now())
+	</insert>
+	
+	<!--  Oracle : selectFAQList -->
+	<!-- <select id="selectFAQList" resultType="hashmap">
+		select f_idx, title, text, to_char(writedate, 'YYYY-MM-DD') writedate, m_idx
+		from ddv_faq
+		order by f_idx desc
+	</select> -->
+	
+	<!-- MySQL : selectFAQList -->
+	<select id="selectFAQList" resultType="hashmap">
+		select f_idx, title, text, date_format(writedate, '%Y-%m-%d') writedate, m_idx
+		from ddv_faq
+		order by f_idx desc
+	</select>
+	
+	<!--  Oracle == MySQL  -->
+<!-- 	<select id="selectOneFAQInfo" parameterType="hashmap" resultType="hashmap">
+		select f_idx, title, text, to_char(writedate, 'YYYY-MM-DD') writedate, m_idx
+		from ddv_faq
+		where f_idx = #{f_idx}
+	</select> -->
+	
+	<!-- MySQL : selectOneFAQInfo -->
+	<select id="selectOneFAQInfo" parameterType="hashmap" resultType="hashmap">
+		select f_idx, title, text, date_format(writedate, '%Y-%m-%d') writedate, m_idx
+		from ddv_faq
+		where f_idx = #{f_idx}
+	</select>
+	
+	</mapper>
+
