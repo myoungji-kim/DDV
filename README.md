@@ -1,4 +1,7 @@
-# 🗂Notion
+# DDV 모바일 설문조사 서비스
+
+
+### 🗂Notion (작업일지)
 https://legend-salamander-66c.notion.site/61dc9b4b951d44f698a49bab97c6705c?v=716dbd12f0c249c0acbbb95b332e5577
 
 
