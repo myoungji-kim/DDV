@@ -56,6 +56,7 @@ public class HomeController {
 			PageInfo pageInfo = new PageInfo(totalCount, page);
 			
 			map.put("pageInfo", pageInfo.getBoardInfo());
+	
 			surveyList = service.selectAllSurvey(map);
 		} catch (Exception e) {
 			e.printStackTrace();
