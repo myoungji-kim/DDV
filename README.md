@@ -2,7 +2,7 @@
 
 
 ### 🗂Notion (작업일지)
-https://legend-salamander-66c.notion.site/61dc9b4b951d44f698a49bab97c6705c?v=716dbd12f0c249c0acbbb95b332e5577
+https://legend-salamander-66c.notion.site/6c6c7d6ea1114fe0ab368ebb8d6a3e0c?v=54cbe6a0e1944e9f8f6bb86bc6435e9d
 
 
 
