@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>DDV</title>
+
+		<meta name="viewport" content="width=800, user-scalable=no" />
+		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+
+		<!-- 미리보기 관련 -->
+		<meta property="og:url" content="http://ddingji.cafe24.com/resources/fo/index.html">
+		<meta property="og:type" content="website">
+		<meta property="og:title" content="DDV">
+		<meta name="keywords" content="">
+		<meta property="og:description" content="모바일 설문조사 앱 DDV (김명지)">
+		<meta property="og:image" content="http://ddingji.cafe24.com/resources/upload/sky(1).jpg">
+		<meta name="description" content="">
+		
+		<link rel="shortcut icon" href="#">
+		<link rel="stylesheet" href="asset/css/common.css" />
+		<link rel="stylesheet" type="text/css" href="asset/css/NanumSquareRound.css" />
+	    <link rel="stylesheet" href="asset/script/jquery.mobile-1.4.5/jquery.mobile-1.4.5.css" />
+	    <link rel="stylesheet" type ="text/css" href="asset/script/jquery-ui-1.12.1.custom/jquery-ui.css"> 
+		
+		<script type = "text/javascript" src="asset/script/jquery-1.11.1.min.js"></script>
+	    <script type = "text/javascript" src="asset/script/jquery-ui-1.12.1.custom/jquery-ui.js"> </script>
+        <script type = "text/javascript" src="asset/script/jquery.mobile-1.4.5/jquery.mobile-1.4.5.min.js"></script>
+        <script type = "text/javascript" src="asset/script/jquery-tmpl-1.4.2.js"> </script>
+        <script type = "text/javascript" src="asset/script/bxslider-4-4.2.12/src/js/jquery.bxslider.js"></script>
+        <script type = "text/javascript" src="asset/script/common.js"></script>
+		<script type = "text/javascript" src="cordova.js"></script>
+	</head>
+	<body>
+
+	<!------------------------------------------>
+	<!-- 비동기 관련 -->
+
+	<!-- ajax 로딩 표시 -->
+	<script id="ajax_loading" type="text/html">
+		<div class="loading">
+			<img src="./asset/images/loading.gif">
+		</div>
+	</script>
+
+	<!-- #ajax_survey -->
+	<script id="ajax_survey" type="text/html">
+		<li page="${page}">
+            <a onclick="surveyJoinStart(${S_IDX})">
+            <div class="ct_wrap">
+                <div class="img_wrap">
+                	<!-- html 관련 소스는 apache 80포트 -->
+                    <img src="http://ddingji.cafe24.com/resources/upload/${MAINIMG}">
+                </div>
+                <div class="text_wrap">
+                    <div class="top">
+                        <span class="title">${TITLE}</span>
+                        <div class="time">
+                            <img src="./asset/images/ico_clock_01.png">
+                            <span>${TIME}분</span>
+                        </div>
+                    </div>
+                    <div class="bottom">
+                        <span>${SUBTITLE}</span>
+                    </div>
+                </div>
+            </div>
+            </a>
+        </li>
+	</script>
+
+
+	<!-- #ajax_surveyJoinStart -->
+	<script id="ajax_surveyJoinStart" type="text/html">
+		<div id="sv_start">
+			<div class="main_wrap">
+				<div class="image_wrap">
+					<div class="box">
+					<img src="http://ddingji.cafe24.com/resources/upload/${MAINIMG}">
+					</div>
+				</div>
+				<div class="text_wrap">
+					<span class="title">${TITLE}</span>
+					<span class="sub">${SUBTITLE}</span>
+				</div>
+			</div>
+			<div class="btn_wrap">
+				<a onclick="reset_surveyJoin()" class="back"><span>취소</span></a>
+				<a class="go" onclick="surveyAlreadyJoinCheck(${S_IDX})"><span>시작</span></a>
+			</div>
+		</div>
+	</script>
+
+
+
+	<!-- #ajax_SurveyJoinIng -->
+	<script id="ajax_SurveyJoinIng" type="text/html">
+		<li>
+			<input type="hidden" name="checking${q_idx}" value="false">
+			<div class="quest_wrap">
+				<div class="quest"><span>${question}</span></div>
+				<div class="img_box"><img src="http://ddingji.cafe24.com/resources/upload/${image1}"></div>
+			</div>
+			<div class="select_wrap">
+				<div class="select_box">
+					<div class="option_wrap"><a onclick="surveyPickAnswer(${q_idx}, 1)"><span>${answerList[0].text}</span></a></div>
+					<div class="option_wrap"><a onclick="surveyPickAnswer(${q_idx}, 2)"><span>${answerList[1].text}</span></a></div>
+					<div class="option_wrap"><a onclick="surveyPickAnswer(${q_idx}, 3)"><span>${answerList[2].text}</span></a></div>
+					<div class="option_wrap"><a onclick="surveyPickAnswer(${q_idx}, 4)"><span>${answerList[3].text}</span></a></div>
+				</div>
+			</div>
+		</li>
+	</script>
+
+
+	<!-- #ajax_SurveyJoinEnd -->
+	<script id="ajax_SurveyJoinEnd" type="text/html">
+		<div class="main_wrap">
+			<div class="image_wrap">
+				<div class="box">
+					<img src="http://ddingji.cafe24.com/resources/upload/${MAINIMG}">
+				</div>
+			</div>
+			<div class="text_wrap">
+				<span class="title">설문에 참여해 주셔서 감사합니다</span>
+				<span class="sub">${POINT}p가 누적되었습니다</span>
+			</div>
+		</div>
+	</script>
+
+
+
+	<!-- #ajax_before/afterLogin : 로그인 전/후에 따라 메뉴 html 변경 -->
+	<script id="ajax_beforeLogin" type="text/html">
+		<div class="text">
+			<a onclick="loginPage(loginForm)"><span>로그인/회원가입하기</span></a>
+		</div>
+	</script>
+
+	<script id="ajax_afterLogin" type="text/html">
+		<div class="text">
+			<span>${userid}</span>
+			<span>${email1}@${email2}</span>
+		</div>
+	</script>
+
+
+	<!-- #ajax_logout : 로그아웃 버튼 유무 -->
+	<script id="ajax_logout" type="text/html">
+		<div class="logout">
+			<a onclick="logout()"><span>로그아웃</span></a>
+		</div>
+	</script>
+
+
+
+
+	<!-- #ajax_mypoll_list : MyPoll 리스트 확인하기 -->
+	<script id="ajax_mypoll_list" type="text/html">
+		<form name="mypollForm_${p_idx}">
+			<div class="poll_wrap">
+				<div class="poll_box">
+					<div class="poll_ct">
+						<div class="top">
+
+							<!-------- 전체 공개 or 일부 공개 (JS) -------->
+							<div class="can_vote">
+								<span>${option1} 공개</span>
+							</div>
+							<!---------------------------------------->
+
+							<div class="info">
+								<img src="asset/images/ico_upload_01.png"><span>${writedate}</span>
+							</div>
+							<div class="info">
+								<img src="asset/images/ico_person_01.png"><span>${countAttends}</span>
+							</div>
+						</div>
+
+						<div class="question">
+							<span class="q_span">${question}
+							</span>
+							<div class="join">
+								<a onclick="poll_open()"><span>결과 보기</span></a>
+							</div>
+						</div>
+						<div class="reset"></div>
+					</div>
+				</div>
+			</div>
+			<!-- mypoll (open) : 설문ing+전체공개 -->
+			<div class="poll_wrap">
+				<div class="dash_line"></div>
+				<div class="poll_box">
+					<div class="poll_ct">
+						<div class="top">
+							<!-------- 참여 가능 or 기간 종료 -------->
+							<div class="can_vote">
+								<span>기간 남음</span>
+							</div>
+							<!--------------------------------------->
+							<span class="end_date">종료일 : ${enddate}</span>
+
+							<a onclick="poll_close()" class="share_result"><img src="asset/images/btn_fold_01.png"></a>
+						</div>
+						<div class="question">
+							<span class="q_span">${question}</span>
+						</div>
+						<div class="select">
+							<img src="http://ddingji.cafe24.com/resources/upload/${image}">
+							<!-- 체크박스 디자인하기 -->
+							<div class="options">
+								<div><input type="radio" name="answer">
+									<span>선택지1</span>
+									<span>50%</span>
+								</div>
+								<div><input type="radio" name="answer">
+									<span>선택지2</span>
+									<span>50%</span>
+								</div>
+								<div><input type="radio" name="answer">
+									<span>선택지3</span>
+									<span>50%</span>
+								</div>
+								<div><input type="radio" name="answer">
+									<span>선택지4</span>
+									<span>50%</span>
+								</div>
+								<div><input type="radio" name="answer">
+									<span>선택지5</span>
+									<span>50%</span>
+								</div>
+							</div>
+							<div class="reset"></div>
+						</div>
+						<div class="vote">
+							<a onclick="open_updatePoll(${p_idx})" style="background-color:#73C977; border-radius: 6px; text-shadow: none;"><span>수정하기</span></a>
+						</div>
+						<div class="reset"></div>
+					</div>
+				</div>
+			</div>
+			<div class="light_line"></div>
+		</form>
+	</script>
+
+
+
+	<!-- #ajax_myPage : 마이페이지(내정보) -->
+	<script id="ajax_myInfoPage" type="text/html">
+		<header id="headerTitle">
+			<div class="ico_lt">
+				<a onclick="go_main()"><img id="btn_ico_lt" src="asset/images/btn_back_01.png"></a>
+			</div>
+			<div class="title">
+				<a class="headerLogo"><img src="asset/images/home_logo_01.png"></a>
+			</div>
+		</header>
+		<form name="myInfoForm">
+			<input type="hidden" name="m_idx" value="${M_IDX}">
+	      	<div id="mypage">
+	            <div id="page_join">
+	            <div id="main">
+	                <table class="join_table">
+	                    <tr>
+	                        <td class="item_th">
+	                           <div><span>이름</span></div>
+	                        </td>
+	                        <td class="item_box">
+	                           <div><input type="text" data-role="none" id="username" name="username" placeholder="이름을 입력하세요" value="${USERNAME}" autocomplete="off" maxlength="20"></div>
+	                        </td>
+	                    </tr>
+	                    <tr>
+	                        <td class="item_th">
+	                           <div><span>성별</span></div>
+	                        </td>
+	                        <td class="item_box">
+	                           <div class="radio"><input type="radio" name="gender" value="M" data-role="none"><span>남</span></div>
+	                           <div class="radio"><input type="radio" name="gender" value="W" data-role="none"><span>여</span></div>
+	                        </td> 
+	                    </tr>
+	                    <tr>
+	                        <td class="item_th">
+	                           <div><span>아이디</span></div>
+	                        </td>
+	                        <td class="item_box">
+	                           <div><input readonly="readonly" data-role="none" id="userid" name="userid" value="${USERID}" maxlength="20"></div>
+	                        </td>
+	                    </tr>
+	                    <tr>
+	                        <td class="item_th">
+	                           <div><span>비밀번호</span></div>
+	                        </td>
+	                        <td class="item_box">
+	                           <div><input type="text" data-role="none" name="passwd1" onkeyup="passwd_check('myInfoPage')" placeholder="비밀번호를 입력하세요" value="${PASSWD}" autocomplete="off" maxlength="15"></div>
+	                        </td>
+	                    </tr>
+	                    <tr>
+	                        <td class="item_th">
+	                           <div><span>재확인</span></div>
+	                        </td>
+	                        <td class="item_box">
+	                           <div><input type="text" data-role="none" name="passwd2" onkeyup="passwd_check('myInfoPage')" placeholder="비밀번호를 다시 한번 입력하세요" autocomplete="off" maxlength="15"></div>
+	                        </td>
+	                    </tr>
+	                    <tr>
+	                        <td></td>
+	                        <input type="hidden" name="chk_pw" value="false" data-role="none">
+	                        <td><span class="pw_check">비밀번호를 입력해주세요</span></td>
+	                    </tr>
+	                    <tr>
+	                        <td class="item_th"><div><span>전화번호</span></div></td>
+	                        <td class="td_phone">
+	                           <select name="phone1" data-role="none">
+	                             <option value="010">010</option>
+	                             <option value="011">011</option>
+	                           </select>
+	                           <span class="link">-</span>
+	                           <input type="text" data-role="none" name="phone2" value="${PHONE2}" autocomplete="off" maxlength="4">
+	                           <span class="link">-</span>
+	                           <input type="text" data-role="none" name="phone3" value="${PHONE3}" autocomplete="off" maxlength="4">
+	                        </td>
+	                    </tr>
+	                    <tr>
+	                        <td class="item_th"><div><span>이메일</span></div></td>
+	                        <td class="td_email">
+	                           <input type="text" data-role="none" name="email1" id="email1" value="${EMAIL1}" placeholder="앞자리" autocomplete="off" maxlength="20">
+	                           <span class="link">@</span>
+	                            <input type="text" data-role="none" name="email2" id="email2" value="${EMAIL2}" placeholder="직접입력" autocomplete="off" maxlength="20">
+	                        </td>
+	                    </tr>
+	                </table>
+	            </div> <!-- end main -->
+	            <div class="btn_wrap">
+		            <a onclick="myInfopage_save(myInfoForm)"><span>저장</span></a>
+		        </div>
+	        </div> <!-- end page_join -->
+	      </div> <!-- end .pro_wrap -->
+	      </div>
+	   </form>
+	</script>
+
+
+	<!-- #mypoll_beforeLogin -->
+	<script id="mypoll_beforeLogin" type="text/html">
+		<div class="before_login">
+			로그인 후 이용 가능한 서비스입니다
+		</div>
+	</script>
+
+
+	<!-- #mypoll_afterLogin -->
+	<script id="mypoll_afterLogin" type="text/html">
+		<!-------------------------------------------->		
+		<!-- #ajax_mypoll_list -->
+		<div class="wrap_mypoll_list"></div>
+		<!-------------------------------------------->
+		
+		<div class="btn_create">
+			<a onclick="open_uploadPoll()"><img src="asset/images/btn_create_01.png"></a>
+		</div>
+	</script>
+
+
+	<!-- #ajax_sumPoint -->
+	<script id="ajax_sumPoint" type="text/html">
+		<div><span>DDV포인트</span></div>
+		<div><span>${sumPoints} P</span></div>
+		<!-- <div class="btn"><a href="#refundPage"><span>현금환급</span></a></div> -->
+	</script>
+
+
+	<!-- #ajax_pointList -->
+	<script id="ajax_pointList" type="text/html">
+		<li class="ct_box">
+			<div class="top">
+				<span>${getdate}</span>
+			</div>
+			<div class="bottom">
+				<span>${title}</span>
+				<span>+${getpoint}P</span>
+			</div>
+		</li>
+	</script>
+
+
+	<!-- #ajax_FAQList -->
+	<script id="ajax_FAQList" type="text/html">
+		<li class="ct_box">
+			<a onclick="open_oneFAQ(${f_idx})">
+			<div class="top">
+				<span>${writedate}</span>
+			</div>
+			<div class="bottom">
+				<span>${title}</span>
+				<span style="color: #777;">관리자</span>
+			</div>
+			</a>
+		</li>
+	</script>
+
+
+	<!-- #ajax_FAQOne -->
+	<script id="ajax_FAQOne" type="text/html">
+		<div class="light_line"></div>
+		<div class="FAQ_wrap">
+			<span class="writedate">${title}</span>
+			<div class="question_box">
+				<span>${text}</span>
+			</div>
+		</div>
+	</script>
+
+
+	<!-- #ajax_inquireList -->
+	<script id="ajax_inquireList" type="text/html">
+		<li class="ct_box">
+			<a onclick="open_oneInquire(${i_idx})">
+			<div class="top">
+				<span>${writedate}</span>
+			</div>
+			<div class="bottom">
+					<span>${question}</span>
+					<span>${complete}</span>
+			</div>
+			</a>
+		</li>
+	</script>
+
+
+	<!-- #ajax_inquireOne -->
+	<script id="ajax_inquireOne" type="text/html">
+		<div class="light_line"></div>
+		<div class="inquire_wrap">
+			<span class="writedate">${writedate}</span>
+			<div class="question_box">
+				<span>${question}</span>
+			</div>
+			<div class="light_line"></div>
+			<span class="answerdate">${answerdate}</span>
+			<div class="answer_box">
+				<span>${answer}</span>
+			</div>
+		</div>
+	</script>
+
+
+	<!-- #ajax_uploadPoll -->
+	<script id="ajax_uploadPoll" type="text/html">
+		<header id="headerTitle">
+			<div class="ico_lt">
+				<a href="javascript:history.back()"><img id="btn_ico_lt" src="asset/images/btn_back_01.png"></a>
+			</div>
+			<div class="title">
+				<a class="headerLogo"><img src="asset/images/home_logo_01.png"></a>
+			</div>
+		</header>
+		<!-- enctype="multipart/form-data" -->
+		<form action="/upload.action" method="post" name="uploadPollForm">
+			<input type="hidden" name="alreadySubmit" value="no">
+			<input type="hidden" name="m_idx" value="">
+			<input type="hidden" name="p_idx" value="${poll.p_idx}">
+			<div id="upload">
+				<div class="body_wrap">
+					<div class="title_wrap">
+						<input type="text" id="question" placeholder="질문 입력" data-role="none" name="title" value="${poll.question}" autocomplete="off" maxlength="50">
+						<div class="title_line"></div>
+					</div>
+					<div class="file_wrap">
+						<div class="info"><span>이미지는 1:1 비율을 권장합니다</span></div>
+						<div class="box">
+							<input type="hidden" name="o_mainimg" value="${poll.image}">
+						    <input class="file_name" id="pollimg" name="image" placeholder="첨부파일" data-role="none" value="${poll.image}">
+						    <label for="file" data-role="none">업로드</label> 
+						    <input type="file" id="file" name="file" data-role="none" accept=".gif, .jpg, .png, .jpeg" onchange="imageSizeCheck(this.value, 'file', 'pollimg')">
+						</div>
+					</div>
+					<div class="select_wrap">
+						<div class="input_wrap">
+							<input type="text" placeholder="선택지 1. 내용 입력" data-role="none" name="text1" autocomplete="off" maxlength="50">
+							<input type="text" placeholder="선택지 2. 내용 입력" data-role="none" name="text2" autocomplete="off" maxlength="50">
+							<input type="text" placeholder="선택지 3. 내용 입력" data-role="none" name="text3" autocomplete="off" maxlength="50">
+							<input type="text" placeholder="선택지 4. 내용 입력" data-role="none" name="text4" autocomplete="off" maxlength="50">
+							<input type="text" placeholder="선택지 5. 내용 입력" data-role="none" name="text5" autocomplete="off" maxlength="50">
+						</div>
+					</div>
+					<div class="option_wrap">
+						<div class="add_option"><span>옵션 설정</span></div>
+						<div class="options">
+							<div><input type="radio" name="option1" value="전체"><span>전체 공개</span></div>
+							<div><input type="radio" name="option1" value="일부"><span>일부 공개</span></div>
+						</div>
+					</div>
+					<div class="endDate_wrap">
+						<div class="add_option"><span>설문 종료일</span></div>
+						<div class="box">
+							<input type="text" data-role="none" id="poll_enddate" class="date_input" placeholder="설문 종료일" name="enddate" value="${poll.enddate}" autocomplete="off">
+						</div>
+					</div>
+					<div class="btn_upload_wrap">
+						<a onclick="upload_poll(uploadPollForm)" class="btn_upload">
+							<span>저장</span>
+						</a>
+						<a onclick="delete_poll(${poll.p_idx})" class="btn_upload" style="margin-top: 15px; border: 1px solid #ff8a57; background-color: #fff;">
+							<span style="color: #ff8a57;">삭제</span>
+						</a>
+					</div>
+					
+				</div>
+			</div>
+		</form>	
+	</script>
+
+	<!-- #ajax_poll -->
+	<script id="ajax_poll" type="text/html">
+		<form name="pollForm_${p_idx}">
+			<input type="hidden" name="p_idx" value="${p_idx}">
+			<!-- 접혀있는 박스 -->
+			<div class="poll_wrap">
+				<div class="poll_box">
+					<div class="poll_ct">
+						<div class="top">
+							<div class="can_vote"><span>참여 가능</span></div>
+							<div class="info"><img src="asset/images/ico_upload_01.png"><span>${writedate}</span></div>
+							<div class="info"><img src="asset/images/ico_person_01.png"><span>${countAttends}</span></div>
+						</div>
+						<div class="question">
+							<span class="q_span">${question}</span>
+							<div class="join">
+								<a onclick="poll_open()"><span>참여</span></a>
+							</div>
+						</div>
+						<div class="reset"></div>
+					</div>
+				</div>
+			</div>
+			
+			<!-- 펼쳐져 있는 박스 (+ 선택지) -->
+			<div class="poll_wrap">
+				<div class="poll_box">
+					<div class="poll_ct">
+						<div class="top">
+							<div class="can_vote"><span>참여 가능</span></div>
+							<span class="end_date">종료일 : ${enddate}</span>
+							<a onclick="poll_close()" class="share_result"><img src="asset/images/btn_fold_01.png"></a>
+						</div>
+						<div class="question">
+							<span class="q_span">${question}</span>
+						</div>
+						<div class="select">
+							<img src="http://ddingji.cafe24.com/resources/upload/${image}">
+							<!-- 체크박스 디자인하기 -->
+							<div class="options">
+								<div><input type="radio" name="answer">
+									<span>선택지1</span>
+								</div>
+								<div><input type="radio" name="answer">
+									<span>선택지2</span>
+								</div>
+								<div><input type="radio" name="answer">
+									<span>선택지3</span>
+								</div>
+								<div><input type="radio" name="answer">
+									<span>선택지4</span>
+								</div>
+								<div><input type="radio" name="answer">
+									<span>선택지5</span>
+								</div>
+							</div>
+							<div class="reset"></div>
+						</div>
+						<div class="vote">
+							<a onclick="poll_vote(pollForm_${p_idx})"><span>투표하기</span></a>
+						</div>
+						<div class="reset"></div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</script>
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<!------------------------------------------>
+	<!-- 페이지 관련 -->
+
+	<!-- Start: 메인 페이지 -->
+	<div data-role="page" id="mainPage" data-direction="left">
+		<!-- Start: #aside -->
+		<div id="aside-black"></div>
+		<div id="aside">
+			<div class="close_wrap">
+				<a onclick="open_menu()" class="ico_wrap">
+					<img src="asset/images/btn_close_01.png">
+				</a>
+				<div class="reset"></div>
+			</div>
+			<div class="pro_wrap">
+				<div class="pro_box">
+					<div class="img_wrap">
+						<img src="asset/images/profile_off_01.png">
+					</div>
+					<!-------------------------------------------->		
+					<!-- #ajax_before/afterLogin -->
+					<div class="beforeAfterLogin"></div>
+					<!-------------------------------------------->	
+				</div>
+			</div>
+			
+			<nav class="menu">
+				<div class="bold_line"></div>
+					<div class="box_wrap">
+						<a onclick="open_myPage()" class="box" data-transition="slidefade">
+							<span>내 정보</span>
+							<img src="asset/images/ico_next_01.png">
+						</a>
+					</div>
+					<div class="light_line"></div>
+					<div class="box_wrap">
+						<a onclick="open_pointPage()" class="box" data-transition="slidefade">
+							<span>포인트</span>
+							<img src="asset/images/ico_next_01.png">
+						</a>
+					</div>
+				<div class="bold_line"></div>
+				<div class="box_wrap">
+					<a onclick="open_FAQPage()" class="box">
+						<span>FAQ</span>
+						<img src="asset/images/ico_next_01.png">
+					</a>
+				</div>
+				<div class="light_line"></div>
+				<div class="box_wrap">
+					<a onclick="open_inquirePage()" class="box">
+						<span>1:1문의</span>
+						<img src="asset/images/ico_next_01.png">
+					</a>
+				</div>
+				<div class="bold_line"></div>
+			</nav>
+
+			<!-------------------------------------------->		
+			<!-- #ajax_logout -->
+			<div class="beforeAfterLogout"></div>
+			<!-------------------------------------------->	
+
+		</div>
+		<!-- end: #aside -->
+
+
+		<!-- Start: #header_box -->
+		<div id="header_box">
+			<header id="headerTitle">
+				<div class="ico_lt">
+					<a onclick="open_menu()"><img id="btn_ico_lt" src="asset/images/ico_menu_lt_01.png"></a>
+				</div>
+				<div class="title">
+					<a class="headerLogo" href="#mainPage"><img src="asset/images/home_logo_01.png"></a>
+				</div>
+			</header>
+			<form class="sch" method="get" name="searchForm">
+				<div class="sch_wrap">
+					<div class="sch_input_wrap">
+						<input type="text" data-role="none" name="searchKey" class="sch_input" 
+							placeholder="원하는 콘텐츠를 검색해보세요" onkeydown="if(event.keyCode === 13) go_search(searchForm);">
+					</div>
+					<div class="sch_ico_rt">
+						<a onclick="go_search(searchForm)"><img src="asset/images/ico_search_01.png"></a>
+					</div>
+				</div>
+			</form>
+			<nav id="nav_main">
+				<ul class="inner">
+					<li>
+						<a onclick="open_survey()" data-transition="fade">서베이</a>
+						<div class="nav_select_bar"></div>
+					</li>
+					<li>
+						<a onclick="open_poll()" data-transition="fade">퀵폴</a>
+						<div class="nav_select_bar"></div>
+					</li>
+					<li>
+						<a onclick="open_mypoll()" data-transition="fade">My 퀵폴</a>
+						<div class="nav_select_bar"></div>
+					</li>
+				</ul>
+			</nav>
+		</div> <!-- end: #header_box -->
+
+
+		<!-- Start: #sv_wrap-->
+		<div id="sv_wrap">
+			<div class="add_info_wrap">
+				<span>다양한 설문조사들을 만나보세요!</span>
+			</div>
+			<ul class="sv_ct">
+			<!-------------------------------------------->		
+			<!-- #ajax_survey -->
+			<!-------------------------------------------->	
+			</ul>
+		</div> 
+		<!-- end: #sv_wrap -->
+
+
+		<!-- Start: #poll -->
+		<div id="poll">
+			<!-------------------------------------------->		
+			<!-- #ajax_poll -->
+			<div class="wrap_poll_list"></div>
+			<!-------------------------------------------->	
+		</div> <!-- end: #ajax_poll -->
+		
+
+		<!-- Start: #mypoll -->
+		<div id="mypoll">
+
+			<!-------------------------------------------->		
+			<!-- #mypoll_beforeLogin -->
+			<!-------------------------------------------->
+
+			<!-------------------------------------------->		
+			<!-- #mypoll_afterLogin -->
+			<!-------------------------------------------->	
+
+		</div> <!-- end: #myPoll -->
+	</div> <!-- end: 메인 페이지 -->
+	
+	
+	
+	
+	<!-- Start : surveyJoin_Start 페이지 -->
+	<div data-role="page" id="surveyJoinPage_Start">
+		<header id="headerTitle">
+			<div class="title">
+				<a class="headerLogo"><img src="asset/images/home_logo_01.png"></a>
+			</div>
+		</header>
+		
+		<!---------------------------------------->
+		<!------ #ajax_surveyJoinStart ------>
+		<div class="survey_start"></div>
+		<!---------------------------------------->
+	</div>
+	<!-- End : surveyJoin_Start 페이지 -->
+
+
+	<!-- Start : surveyJoinPage_Ing 페이지 -->
+	<div data-role="page" id="surveyJoinPage_Ing">
+		<div id="sv_ing">
+			<div class="num_wrap">
+				<span>(현재 문항 번호)</span>
+				<span>/</span>
+				<span>(총 문항 수)</span>
+			</div>
+			<ul class="survey_slider">
+				<!---------------------------------------->
+				<!------ #ajax_SurveyJoinIng ------>
+				<!---------------------------------------->
+			</ul>
+			<div class="btn_wrap">
+				<a class="slider-prev-btn"><span>이전</span></a>
+				<a class="slider-next-btn"><span>다음</span></a>
+				<div class="reset"></div>
+			</div>
+		</div>
+	</div>
+	<!-- End : surveyJoinPage_Ing 페이지 -->
+
+
+	<!-- Start : surveyJoinPage_End 페이지 -->
+	<div data-role="page" id="surveyJoinPage_End"> 
+		<div id="sv_end">
+			<!---------------------------------------->
+			<!------ #ajax_SurveyJoinEnd ------><div class="surveyEndInfo"></div>
+			<!---------------------------------------->
+			<div class="btn_wrap">
+				<a href="#mainPage" class="btn"><span>메인으로 돌아가기</span></a>
+			</div>
+		</div>
+	</div>
+	<!-- End : surveyJoinPage_End 페이지 -->
+
+
+
+
+
+
+
+	<!-- Start: 퀵폴 등록 페이지 -->
+	<div data-role="page" id="uploadPoll">
+		<!---------------------------------------->
+		<!------ #ajax_uploadPoll ------>
+		<!---------------------------------------->
+	</div>	
+	<!-- End: 퀵폴 등록 페이지 -->
+
+
+
+
+
+
+	<!-- Start: 로그인 페이지 -->
+	<div data-role="page" id="loginPage">
+	<div id="login">
+		<div class="back_wrap">
+			<a href="#mainPage" class="ico_wrap">
+				<img src="asset/images/btn_back_01.png">
+			</a>
+			<div class="reset"></div>
+		</div>
+		<form name="loginForm" id="login_form">
+		<div class="login_wrap">
+			<div class="logo_wrap"><img src="asset/images/login_logo_01.png"></div>
+			<div class="input_wrap">
+				<input type="text" name="userid" placeholder="아이디" data-role="none" autocomplete="off">
+				<input type="password" name="passwd" placeholder="패스워드" data-role="none" autocomplete="off">
+			</div>
+			<div class="btn_login_wrap">
+				<a onclick="login(loginForm)" class="btn_login">
+					<span>로그인</span>
+				</a>
+			</div>
+		</div>
+		</form>
+		<div class="find_wrap">
+			<a onclick="open_findIDPage(findIDForm)"><span>아이디 찾기</span></a>
+			<span> | </span>
+			<a onclick="open_memberJoinPage(memberJoinForm)"><span>회원가입</span></a>
+		</div>
+	</div>
+	</div>
+	<!-- End: 로그인 페이지 -->
+
+	<!-- Start: 회원가입 페이지 -->
+	<div data-role="page" id="memberJoinPage">
+	<div id="join">		
+		<div class="back_wrap">
+			<a href="javascript:history.back()" class="ico_wrap">
+				<img src="asset/images/btn_back_01.png">
+			</a>
+			<div><span>회원가입</span></div>
+			<div class="reset"></div>
+		</div>
+		<div id="page_join">
+			<div id="main">
+				<form id="member_joinForm" name="memberJoinForm">
+					<table class="join_table">
+						<tr>
+							<td class="item_th">
+								<div><span>이름</span></div>
+							</td>
+							<td class="item_box">
+								<div><input type="text" data-role="none" id="username" name="username" placeholder="이름을 입력하세요" autocomplete="off" maxlength="20"></div>
+							</td>
+						</tr>
+						<tr>
+							<td class="item_th">
+								<div><span>성별</span></div>
+							</td>
+							<td class="item_box">
+								<div class="radio"><input type="radio" name="gender" value="M" data-role="none"><span>남</span></div>
+								<div class="radio"><input type="radio" name="gender" value="W" data-role="none"><span>여</span></div>
+							</td> 
+						</tr>
+						<tr>
+							<td class="item_th">
+								<div><span>아이디</span></div>
+							</td>
+							<td class="item_box">
+								<div><input type="text" data-role="none" id="userid" name="userid" onkeyup="userid_check()" placeholder="아이디를 입력하세요" autocomplete="off"></div>
+							</td>
+						</tr>
+						<tr>
+							<td></td>
+							<input type="hidden" id="chk_id" name="chk_id" value="false" data-role="none">
+							<td><span id="id_check" class="id_check">아이디를 입력해주세요</span></td>
+						</tr>
+						<tr>
+							<td class="item_th">
+								<div><span>비밀번호</span></div>
+							</td>
+							<td class="item_box">
+								<div><input type="password" data-role="none" id="passwd1" name="passwd1" onkeyup="passwd_check('memberJoinPage')" placeholder="비밀번호를 입력하세요" autocomplete="off" maxlength="15"></div>
+							</td>
+						</tr>
+						<tr>
+							<td class="item_th">
+								<div><span>재확인</span></div>
+							</td>
+							<td class="item_box">
+								<div><input type="password" data-role="none" id="passwd2" name="passwd2" onkeyup="passwd_check('memberJoinPage')" placeholder="비밀번호를 다시 한번 입력하세요" autocomplete="off" maxlength="15"></div>
+							</td>
+						</tr>
+						<tr>
+							<td></td>
+							<input type="hidden" id="chk_pw" name="chk_pw" value="false" data-role="none">
+							<td><span class="pw_check">비밀번호를 입력해주세요</span></td>
+						</tr>
+						
+						<tr>
+							<td class="item_th"><div><span>전화번호</span></div></td>
+							<td class="td_phone">
+								<select name="phone1" data-role="none">
+								  <option value="010">010</option>
+								  <option value="011">011</option>
+								</select>
+								<span class="link">-</span>
+								<input type="text" data-role="none" name="phone2" autocomplete="off" maxlength="4">
+								<span class="link">-</span>
+								<input type="text" data-role="none" name="phone3" autocomplete="off" maxlength="4">
+							</td>
+						</tr>
+						<tr>
+							<td class="item_th"><div><span>이메일</span></div></td>
+							<td class="td_email">
+								<input type="text" data-role="none" name="email1" id="email1" placeholder="앞자리" autocomplete="off" maxlength="20">
+								<span class="link">@</span>
+							    <input type="text" data-role="none" name="email2" id="email2" placeholder="직접입력" autocomplete="off" maxlength="20">
+							</td>
+						</tr>
+					</table>
+					
+				</form>
+			</div> <!-- end main -->
+		</div> <!-- end page_join -->
+		<div class="btn_login_wrap">
+			<a onclick="member_join(memberJoinForm)" class="btn_login">
+				<span>회원가입</span>
+			</a>
+		</div>
+	</div>
+	</div>
+	<!-- End: 회원가입 페이지 -->
+
+
+
+
+	<!-- Start: 아이디 찾기 페이지 -->
+	<div data-role="page" id="findIDPage">
+	<div id="join">		
+		<div class="back_wrap">
+			<a  href="javascript:history.back()" class="ico_wrap">
+				<img src="asset/images/btn_back_01.png">
+			</a>
+			<div><span>아이디 찾기</span></div>
+			<div class="reset"></div>
+		</div>
+		<div id="page_join">
+			<div id="main">
+				<form id="member_findIDForm" name="findIDForm">
+					<table class="join_table">
+						<tr>
+							<td class="item_th">
+								<div><span>이름</span></div>
+							</td>
+							<td class="item_box">
+								<div><input type="text" data-role="none" id="username" name="username" placeholder="이름을 입력하세요" autocomplete="off" maxlength="20"></div>
+							</td>
+						</tr>
+						<tr>
+							<td class="item_th"><div><span>전화번호</span></div></td>
+							<td class="td_phone">
+								<select name="phone1" data-role="none">
+								  <option value="010">010</option>
+								  <option value="011">011</option>
+								</select>
+								<span class="link">-</span>
+								<input type="text" data-role="none" name="phone2" autocomplete="off" maxlength="4">
+								<span class="link">-</span>
+								<input type="text" data-role="none" name="phone3" autocomplete="off" maxlength="4">
+							</td> 
+						</tr>
+					</table>
+					
+				</form>
+			</div> <!-- end main -->
+		</div> <!-- end page_join -->
+		<div class="btn_login_wrap">
+			<a onclick="find_id(findIDForm)" class="btn_login">
+				<span>아이디 찾기</span>
+			</a>
+		</div>
+	</div>
+	</div>
+	<!-- End: 아이디 찾기 페이지 -->
+
+
+
+
+	<!-- Start: 내 정보 페이지 -->
+	<div data-role="page" id="myInfoPage">
+		<!---------------------------------------->
+		<!------ #ajax_myInfoPage ------>
+		<!---------------------------------------->
+	</div>
+	<!-- End: 내 정보 페이지 -->
+
+
+
+
+	<!-- Start: 포인트 페이지 -->
+	<div data-role="page" id="pointPage">
+		<header id="headerTitle">
+			<div class="ico_lt">
+				<a onclick="go_main()"><img id="btn_ico_lt" src="asset/images/btn_back_01.png"></a>
+			</div>
+			<div class="title">
+				<a class="headerLogo"><img src="asset/images/home_logo_01.png"></a>
+			</div>
+		</header>
+
+		<div id="point">
+			<div class="light_line"></div>
+			<div class="point_wrap">
+				<!---------------------------------------->
+				<!------ #ajax_sumPoint ------>
+				<!---------------------------------------->
+			</div>
+			<div class="record_wrap">
+				<div class="title_wrap">
+					<div class="title_box">
+						<span>제목</span>
+						<span>포인트</span>
+					</div>
+				</div>
+				<ul class="ct_wrap">
+					<!---------------------------------------->
+					<!------ #ajax_pointList ------>
+					<!---------------------------------------->
+				</ul>
+			</div>
+		</div>
+	</div>
+	<!-- End: 포인트 페이지 -->
+
+
+	<!-- Start: FAQ 페이지 (리스트) -->
+	<div data-role="page" id="FAQPage">
+		<header id="headerTitle">
+			<div class="ico_lt">
+				<a onclick="go_main()"><img id="btn_ico_lt" src="asset/images/btn_back_01.png"></a>
+			</div>
+			<div class="title">
+				<a class="headerLogo"><img src="asset/images/home_logo_01.png"></a>
+			</div>
+		</header>
+
+		<div id="FAQ">
+			<div class="light_line"></div>
+			<div class="record_wrap">
+				<div class="title_wrap">
+					<div class="title_box">
+						<span>제목</span>
+						<span>작성자</span>
+					</div>
+				</div>
+				<ul class="ct_wrap">
+					<!---------------------------------------->
+					<!------ #ajax_FAQList ------>
+					<!---------------------------------------->
+				</ul>
+			</div>
+		</div>
+	</div>
+	<!-- End: FAQ 페이지 -->
+
+
+	<!-- Start: FAQ 페이지 (개별 자세히 보기) -->
+	<div data-role="page" id="FAQOnePage">
+		<header id="headerTitle">
+			<div class="ico_lt">
+				<a onclick="open_FAQPage()"><img id="btn_ico_lt" src="asset/images/btn_back_01.png"></a>
+			</div>
+			<div class="title">
+				<a class="headerLogo"><img src="asset/images/home_logo_01.png"></a>
+			</div>
+		</header>
+
+		<div id="FAQ">
+			<!---------------------------------------->
+			<!------ #ajax_FAQOne ------>
+			<!---------------------------------------->
+		</div>
+	</div>
+	<!-- End: FAQ 페이지 (개별 자세히 보기) -->
+
+
+
+	<!-- Start: 1:1 문의 페이지 (리스트) -->
+	<div data-role="page" id="inquirePage">
+		<header id="headerTitle">
+			<div class="ico_lt">
+				<a onclick="go_main()"><img id="btn_ico_lt" src="asset/images/btn_back_01.png"></a>
+			</div>
+			<div class="title">
+				<a class="headerLogo"><img src="asset/images/home_logo_01.png"></a>
+			</div>
+		</header>
+
+		<div id="inquire">
+			<div class="light_line"></div>
+			<div class="record_wrap">
+				<div class="title_wrap">
+					<div class="title_box">
+						<span>제목</span>
+						<span>답변 여부</span>
+					</div>
+				</div>
+				<ul class="ct_wrap">
+					<!---------------------------------------->
+					<!------ #ajax_inquireList ------>
+					<!---------------------------------------->
+				</ul>
+			</div>
+		</div>
+		<div class="btn_create">
+			<a onclick="open_uploadInquire(uploadInquireForm)"><img src="asset/images/btn_create_01.png"></a>
+		</div>
+	</div>
+	<!-- End: 1:1 문의 페이지 (리스트) -->
+
+
+	<!-- Start: 1:1 문의 페이지 (개별 자세히 보기) -->
+	<div data-role="page" id="inquireOnePage">
+		<header id="headerTitle">
+			<div class="ico_lt">
+				<a onclick="open_inquirePage()"><img id="btn_ico_lt" src="asset/images/btn_back_01.png"></a>
+			</div>
+			<div class="title">
+				<a class="headerLogo"><img src="asset/images/home_logo_01.png"></a>
+			</div>
+		</header>
+
+		<div id="inquire">
+			<!---------------------------------------->
+			<!------ #ajax_inquireOne ------>
+			<!---------------------------------------->
+		</div>
+	</div>
+	<!-- End: 1:1 문의 페이지 (개별 자세히 보기) -->
+
+
+	<!-- Start: 1:1 문의 페이지 (질문 등록하기) -->
+	<div data-role="page" id="uploadInquire">
+		<header id="headerTitle">
+			<div class="ico_lt">
+				<a onclick="open_inquirePage()"><img id="btn_ico_lt" src="asset/images/btn_back_01.png"></a>
+			</div>
+			<div class="title">
+				<a class="headerLogo"><img src="asset/images/home_logo_01.png"></a>
+			</div>
+			<div class="upload_wrap">
+				<a onclick="upload_inquire(uploadInquireForm)" class="btn_upload">
+					<span>등록</span>
+				</a>
+			</div>
+		</header>
+
+		<div id="inquire">
+			<form name="uploadInquireForm" method="POST">
+			<div class="light_line"></div>
+			<div class="inquire_wrap">
+				<span class="writedate">1:1 문의 질문 등록하기</span>
+				<div class="question_box_2">
+					<textarea data-role="none" name="question" placeholder="질문을 입력해주세요" maxlength="500"></textarea>
+				</div>
+			</div>
+			</form>
+		</div>
+	</div>
+	<!-- End: 1:1 문의 페이지 (질문 등록하기) -->
+
+
+</body>
+</html>
